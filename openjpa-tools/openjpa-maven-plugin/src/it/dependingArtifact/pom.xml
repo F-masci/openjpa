@@ -21,49 +21,43 @@
     Maven release plugin requires the project tag to be on a single line.
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
-    <modelVersion>4.0.0</modelVersion>
-
-    <parent>
-        <groupId>org.apache.openjpa</groupId>
-        <artifactId>openjpa-tools</artifactId>
-        <version>@pom.version@</version>
-    </parent>
-
-    <groupId>org.apache.openjpa.tools.openjpa-maven-plugin.testing</groupId>
-    <artifactId>dependingProjects</artifactId>
-    <version>1.0-SNAPSHOT</version>
-    <packaging>pom</packaging>
-
-    <description>
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.apache.openjpa</groupId>
+    <artifactId>openjpa-tools</artifactId>
+    <version>@pom.version@</version>
+  </parent>
+  <groupId>org.apache.openjpa.tools.openjpa-maven-plugin.testing</groupId>
+  <artifactId>dependingProjects</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+  <description>
         This IT tests if JPA classes (in our case an Enum) in a depending artifact can properly
         be used by another artifact.
     </description>
-
-    <dependencies>
-        <dependency>
-            <groupId>jakarta.persistence</groupId>
-            <artifactId>jakarta.persistence-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>jakarta.validation</groupId>
-            <artifactId>jakarta.validation-api</artifactId>
-        </dependency>    </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-
-    <modules>
-        <module>prjA</module>
-        <module>prjB</module>
-    </modules>
+  <dependencies>
+    <dependency>
+      <groupId>jakarta.persistence</groupId>
+      <artifactId>jakarta.persistence-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.validation</groupId>
+      <artifactId>jakarta.validation-api</artifactId>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <configuration>
+          <skip>true</skip>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  <modules>
+    <module>prjA</module>
+    <module>prjB</module>
+  </modules>
 </project>

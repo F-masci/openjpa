@@ -21,78 +21,38 @@
     Maven release plugin requires the project tag to be on a single line.
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
-    <modelVersion>4.0.0</modelVersion>
-
-    <parent>
-        <groupId>org.apache.openjpa</groupId>
-        <artifactId>openjpa-integration</artifactId>
-        <version>4.1.1-SNAPSHOT</version>
-    </parent>
-
-    <artifactId>openjpa-integration-slf4j</artifactId>
-    <packaging>jar</packaging>
-    <name>OpenJPA Integration Tests - SLF4JLogFactory</name>
-    <description>OpenJPA Integration Tests - SLF4JLogFactory</description>
-
-    <properties>
-        <!-- use SLF4JLogFactory for logging -->
-        <openjpa.Log>slf4j</openjpa.Log>
-    </properties>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.openjpa</groupId>
-            <artifactId>openjpa-all</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.openjpa</groupId>
-            <artifactId>openjpa-persistence-jdbc</artifactId>
-            <version>${project.version}</version>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
-
-    <build>
-        <plugins>
-            <!-- Extract the common test support files from o-p-j-tests.jar -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>unpack</id>
-                        <phase>test-compile</phase>
-                        <goals>
-                            <goal>unpack</goal>
-                        </goals>
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>org.apache.openjpa</groupId>
-                                    <artifactId>openjpa-persistence-jdbc</artifactId>
-                                    <version>${project.version}</version>
-                                    <type>test-jar</type>
-                                    <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
-                                    <includes>org/apache/openjpa/persistence/test/*.class</includes>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <!-- new way of using openjpa-maven-plugin to enhance classes
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.apache.openjpa</groupId>
+    <artifactId>openjpa-integration</artifactId>
+    <version>4.1.1-SNAPSHOT</version>
+  </parent>
+  <artifactId>openjpa-integration-slf4j</artifactId>
+  <packaging>jar</packaging>
+  <name>OpenJPA Integration Tests - SLF4JLogFactory</name>
+  <description>OpenJPA Integration Tests - SLF4JLogFactory</description>
+  <properties>
+    <!-- use SLF4JLogFactory for logging -->
+    <openjpa.Log>slf4j</openjpa.Log>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.openjpa</groupId>
+      <artifactId>openjpa-all</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <!-- new way of using openjpa-maven-plugin to enhance classes
             <plugin>
                 <groupId>org.apache.openjpa</groupId>
                 <artifactId>openjpa-maven-plugin</artifactId>
@@ -128,24 +88,22 @@
                 </dependencies>
             </plugin>
             -->
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <argLine>${surefire.jvm.args}</argLine>
-                    <excludes>
-                        <!-- exclude classes that end with 'Test'; these
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <argLine>${surefire.jvm.args}</argLine>
+          <excludes>
+            <!-- exclude classes that end with 'Test'; these
                              are not test cases per OpenJPA standards -->
-                        <exclude>org/apache/openjpa/**/*Test.java</exclude>
-
-                        <!-- exclude classes that include a $; inner classes
+            <exclude>org/apache/openjpa/**/*Test.java</exclude>
+            <!-- exclude classes that include a $; inner classes
                              are not test cases per OpenJPA standards -->
-                        <exclude>org/apache/openjpa/**/*$*.class</exclude>
-                        <exclude>org/apache/openjpa/**/*.*.class</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+            <exclude>org/apache/openjpa/**/*$*.class</exclude>
+            <exclude>org/apache/openjpa/**/*.*.class</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

@@ -18,41 +18,38 @@
  under the License.
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
-    <modelVersion>4.0.0</modelVersion>
-
-    <parent>
-        <groupId>org.apache.openjpa</groupId>
-        <artifactId>openjpa-parent</artifactId>
-        <version>4.1.1-SNAPSHOT</version>
-    </parent>
-
-    <artifactId>openjpa-junit5</artifactId>
-    <packaging>jar</packaging>
-    <name>OpenJPA JUnit 5</name>
-    <description>OpenJPA JUnit 5</description>
-
-    <dependencies>
-        <dependency>
-            <groupId>jakarta.persistence</groupId>
-            <artifactId>jakarta.persistence-api</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.openjpa</groupId>
-            <artifactId>openjpa</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency> <!-- only for auto mode, can be excluded if not used -->
-            <groupId>org.apache.xbean</groupId>
-            <artifactId>xbean-finder</artifactId>
-            <version>${xbean.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter</artifactId>
-            <version>5.6.1</version>
-            <scope>provided</scope>
-        </dependency>
-    </dependencies>
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.apache.openjpa</groupId>
+    <artifactId>openjpa-parent</artifactId>
+    <version>4.1.1-SNAPSHOT</version>
+  </parent>
+  <artifactId>openjpa-junit5</artifactId>
+  <packaging>jar</packaging>
+  <name>OpenJPA JUnit 5</name>
+  <description>OpenJPA JUnit 5</description>
+  <dependencies>
+    <dependency>
+      <groupId>jakarta.persistence</groupId>
+      <artifactId>jakarta.persistence-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.openjpa</groupId>
+      <artifactId>openjpa</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <!-- only for auto mode, can be excluded if not used -->
+      <groupId>org.apache.xbean</groupId>
+      <artifactId>xbean-finder</artifactId>
+      <version>${xbean.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <version>5.6.1</version>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
 </project>

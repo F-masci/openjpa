@@ -23,27 +23,22 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-
   <parent>
-      <groupId>org.apache.openjpa</groupId>
-      <artifactId>openjpa-examples</artifactId>
-      <version>4.1.1-SNAPSHOT</version>
+    <groupId>org.apache.openjpa</groupId>
+    <artifactId>openjpa-examples</artifactId>
+    <version>4.1.1-SNAPSHOT</version>
   </parent>
-
   <groupId>org.apache.openjpa.openjpa-examples</groupId>
   <artifactId>image-gallery</artifactId>
   <packaging>jar</packaging>
-
   <name>OpenJPA Examples - image-gallery</name>
   <description>Apache OpenJPA Examples - image-gallery</description>
-
   <properties>
     <test.jvm.maxheapsize>1024m</test.jvm.maxheapsize>
     <test.jvm.arguments>-Xmx${test.jvm.maxheapsize}</test.jvm.arguments>
     <surefire.jvm.args>${test.jvm.arguments}</surefire.jvm.args>
     <checkstyle.suppressions.location>${project.basedir}${file.separator}..${file.separator}..${file.separator}openjpa-project${file.separator}suppressions.xml</checkstyle.suppressions.location>
   </properties>
-
   <dependencies>
     <dependency>
       <groupId>org.apache.openjpa</groupId>
@@ -64,7 +59,6 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-
   <build>
     <pluginManagement>
       <plugins>
@@ -81,35 +75,7 @@
         </plugin>
       </plugins>
     </pluginManagement>
-
     <plugins>
-      <plugin>
-          <!-- Use the openjpa maven plugin to enhance the domain model classes -->
-          <groupId>org.apache.openjpa</groupId>
-          <artifactId>openjpa-maven-plugin</artifactId>
-          <configuration>
-            <includes>org/apache/openjpa/examples/gallery/model/*.class</includes>
-            <addDefaultConstructor>true</addDefaultConstructor>
-            <enforcePropertyRestrictions>true</enforcePropertyRestrictions>
-            <persistenceXmlFile>${project.basedir}/src/test/resources/META-INF/persistence.xml</persistenceXmlFile>
-          </configuration>
-          <executions>
-            <execution>
-              <id>enhancer</id>
-              <phase>process-test-classes</phase>
-              <goals>
-                <goal>test-enhance</goal>
-              </goals>
-            </execution>
-          </executions>
-          <dependencies>
-            <dependency>
-              <groupId>org.apache.openjpa</groupId>
-              <artifactId>openjpa-all</artifactId>
-              <version>${project.version}</version>
-            </dependency>
-          </dependencies>
-      </plugin>
     </plugins>
   </build>
 </project>

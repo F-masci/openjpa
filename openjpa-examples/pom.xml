@@ -22,54 +22,46 @@
     the release plugin.
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
-    <modelVersion>4.0.0</modelVersion>
-
-    <parent>
-        <groupId>org.apache.openjpa</groupId>
-        <artifactId>openjpa-parent</artifactId>
-        <version>4.1.1-SNAPSHOT</version>
-    </parent>
-
-    <artifactId>openjpa-examples</artifactId>
-    <packaging>pom</packaging>
-
-    <name>OpenJPA Examples</name>
-    <description>OpenJPA Examples</description>
-
-    <properties>
-        <openjpa.Log>DefaultLevel=WARN</openjpa.Log>
-        <checkstyle.suppressions.location>${project.basedir}${file.separator}..${file.separator}openjpa-project${file.separator}suppressions.xml</checkstyle.suppressions.location>
-    </properties>
-
-    <modules>
-        <module>simple</module>
-        <module>image-gallery</module>
-        <module>openbooks</module>
-    </modules>
-
-    <profiles>
-        <profile>
-            <id>test-dynamic-enhancer</id>
-            <properties>
-                <policy.file>${basedir}/../../openjpa-persistence-jdbc/src/test/resources/j2.security.test.policy</policy.file>
-            </properties>
-        </profile>
-    </profiles>
-
-    <build>
-        <pluginManagement>
-            <plugins>
-                <!-- disable creating javadoc for these modules -->
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-javadoc-plugin</artifactId>
-                    <configuration>
-                        <skip>true</skip>
-                    </configuration>
-                    <inherited>true</inherited>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-    </build>
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.apache.openjpa</groupId>
+    <artifactId>openjpa-parent</artifactId>
+    <version>4.1.1-SNAPSHOT</version>
+  </parent>
+  <artifactId>openjpa-examples</artifactId>
+  <packaging>pom</packaging>
+  <name>OpenJPA Examples</name>
+  <description>OpenJPA Examples</description>
+  <properties>
+    <openjpa.Log>DefaultLevel=WARN</openjpa.Log>
+    <checkstyle.suppressions.location>${project.basedir}${file.separator}..${file.separator}openjpa-project${file.separator}suppressions.xml</checkstyle.suppressions.location>
+  </properties>
+  <modules>
+    <module>simple</module>
+    <module>image-gallery</module>
+    <module>openbooks</module>
+  </modules>
+  <profiles>
+    <profile>
+      <id>test-dynamic-enhancer</id>
+      <properties>
+        <policy.file>${basedir}/../../openjpa-persistence-jdbc/src/test/resources/j2.security.test.policy</policy.file>
+      </properties>
+    </profile>
+  </profiles>
+  <build>
+    <pluginManagement>
+      <plugins>
+        <!-- disable creating javadoc for these modules -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <configuration>
+            <skip>true</skip>
+          </configuration>
+          <inherited>true</inherited>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
 </project>
