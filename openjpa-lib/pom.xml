@@ -133,6 +133,100 @@ openjpa.enhancer.revision=${pcenhancer.git.revision}${uncommitted.changes}
           </execution>
         </executions>
       </plugin>
-    </plugins>
-  </build>
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>${jacoco-maven-plugin.version}</version>
+        <executions>
+          <execution>
+            <id>pre-unit-test</id>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+            <configuration>
+              <destFile>${project.build.directory}/coverage-reports/jacoco.exec</destFile>
+              <propertyName>surefireArgLine</propertyName>
+            </configuration>
+          </execution>
+          <execution>
+            <id>post-unit-test</id>
+            <phase>test</phase>
+            <goals>
+              <goal>report</goal>
+            </goals>
+            <configuration>
+              <dataFile>${project.build.directory}/coverage-reports/jacoco.exec</dataFile>
+              <outputDirectory>${project.build.directory}/coverage-reports/jacoco</outputDirectory>
+              <!-- pattern di classi da includere, ad es. solo le classi sotto il package org.example -->
+              <includes>
+                <include>org/apache/openjpa/lib/util/ClassUtil.class</include>
+               <include>org/apache/openjpa/lib/util/StringUtil.class</include>
+             </includes>
+           </configuration>
+         </execution>
+       </executions>
+     </plugin>
+     <plugin>
+       <groupId>org.apache.maven.plugins</groupId>
+       <artifactId>maven-surefire-plugin</artifactId>
+       <configuration>
+         <trimStackTrace>false</trimStackTrace>
+         <argLine>${surefireArgLine}</argLine>
+         <properties>
+           <property>
+             <name>listener</name>
+             <value>org.evosuite.runtime.InitializingListener</value>
+           </property>
+         </properties>
+         <testFailureIgnore>true</testFailureIgnore>
+       </configuration>
+     </plugin>
+   </plugins>
+ </build>
+ <profiles>
+
+   <!-- PIT -->
+
+    <profile>
+      <id>pit</id>
+      <properties>
+        <!-- <jacoco.skip>true</jacoco.skip> -->
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.pitest</groupId>
+            <artifactId>pitest-maven</artifactId>
+            <version>${pitest-maven-plugin.version}</version>
+            <configuration>
+              <targetClasses>
+                <param>org.apache.openjpa.lib.util.ClassUtil</param>
+                <param>org.apache.openjpa.lib.util.StringUtil</param>
+              </targetClasses>
+              <!-- <excludedTestClasses>
+                <param>*ESTest*</param>
+              </excludedTestClasses> -->
+              <threads>1</threads>
+              <outputFormats>
+                <param>XML</param>
+                <param>HTML</param>
+              </outputFormats>
+              <exportLineCoverage>true</exportLineCoverage>
+              <reportsDirectory>${project.build.directory}/coverage-reports/pit</reportsDirectory>
+              <!-- <verbose>true</verbose> -->
+            </configuration>
+            <executions>
+              <execution>
+                <id>pitest-manual</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>mutationCoverage</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>

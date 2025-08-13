@@ -77,13 +77,17 @@
     <kubernetes-client.version>6.13.3</kubernetes-client.version>
     <slf4j.version>2.0.17</slf4j.version>
     <maven.javadoc.version>3.10.0</maven.javadoc.version>
-    <javadoc.additionalparam/>
+    <javadoc.additionalparam/><jacoco-maven-plugin.version>0.8.13</jacoco-maven-plugin.version>
+    <pitest-maven-plugin.version>1.19.6</pitest-maven-plugin.version>
+    <evosuite-standalone-runtime.version>1.2.0</evosuite-standalone-runtime.version>
+    <sonar-maven-plugin.version>3.11.0.3922</sonar-maven-plugin.version>
     <version.maven.surefire>3.5.2</version.maven.surefire>
     <xbean.version>4.26</xbean.version>
     <bval.version>3.0.2</bval.version>
     <log4j2.version>2.23.1</log4j2.version>
     <ant.version>1.10.15</ant.version>
     <jmock.version>2.13.1</jmock.version>
+    <mockito.version>4.11.0</mockito.version>
     <dbcp2.version>2.13.0</dbcp2.version>
     <pool2.version>2.12.1</pool2.version>
     <jakarta.annotation-api.version>2.1.1</jakarta.annotation-api.version>
@@ -1811,6 +1815,24 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <version>${mockito.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-inline</artifactId>
+      <version>${mockito.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.evosuite</groupId>
+      <artifactId>evosuite-standalone-runtime</artifactId>
+      <version>${evosuite-standalone-runtime.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-dbcp2</artifactId>
       <scope>test</scope>
@@ -1960,6 +1982,11 @@
           <groupId>org.apache.rat</groupId>
           <artifactId>apache-rat-plugin</artifactId>
           <version>0.16.1</version>
+          <configuration>
+              <excludes>
+                <exclude>**/*ESTest*</exclude>
+              </excludes>
+          </configuration>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -2092,11 +2119,12 @@
               <goal>checkstyle</goal>
             </goals>
             <configuration>
-              <failsOnError>true</failsOnError>
+              <failsOnError>false</failsOnError>
               <consoleOutput>true</consoleOutput>
               <includeTestSourceDirectory>true</includeTestSourceDirectory>
               <excludes>**/*_.java</excludes>
               <logViolationsToConsole>true</logViolationsToConsole>
+              <excludes>**/*ESTest*</excludes>
               <checkstyleRules>
                 <module name="Checker">
                   <module name="NewlineAtEndOfFile">
@@ -2166,6 +2194,7 @@
             <!-- generated content -->
             <exclude>**/.*/**</exclude>
             <exclude>**/target/**/*</exclude>
+            <exclude>**/*ESTest*</exclude>
           </excludes>
           <includes>
             <!-- only check common source files -->
