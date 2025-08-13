@@ -18,5 +18,14 @@ jobs:
           java-version: '11'
           distribution: 'temurin'
           cache: maven
+      - name: Install EvoSuite Runtime
+        run: |
+          wget https://github.com/EvoSuite/evosuite/releases/download/v1.2.0/evosuite-standalone-runtime-1.2.0.jar
+          mvn install:install-file -Dfile=evosuite-standalone-runtime-1.2.0.jar \
+            -DgeneratePom=true \
+            -DartifactId=evosuite-standalone-runtime \
+            -DgroupId=org.evosuite \
+            -Dversion=1.2.0 \
+            -Dpackaging=jar
       - name: Test with Maven
         run: mvn -B clean test
