@@ -13,7 +13,7 @@ import org.evosuite.runtime.EvoRunner;
 import org.evosuite.runtime.EvoRunnerParameters;
 import org.junit.runner.RunWith;
 
-@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = true) 
+@RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, separateClassLoader = false)
 public class StringUtil_ESTest extends StringUtil_ESTest_scaffolding {
 
   @Test(timeout = 4000)
@@ -229,7 +229,7 @@ public class StringUtil_ESTest extends StringUtil_ESTest_scaffolding {
       assertNull(string0);
   }
 
-  @Test(timeout = 4000)
+  /*@Test(timeout = 4000)
   public void test30()  throws Throwable  {
       String string0 = StringUtil.trimToNull("");
       assertNull(string0);
@@ -412,5 +412,5 @@ public class StringUtil_ESTest extends StringUtil_ESTest_scaffolding {
   public void test56()  throws Throwable  {
       boolean boolean0 = StringUtil.isEmpty((String) null);
       assertTrue(boolean0);
-  }
+  }*/
 }

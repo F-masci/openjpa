@@ -29,8 +29,8 @@ public class StringUtil_ESTest_scaffolding {
     org.evosuite.runtime.RuntimeSettings.maxNumberOfThreads = 100; 
     org.evosuite.runtime.RuntimeSettings.maxNumberOfIterationsPerLoop = 10000; 
     org.evosuite.runtime.RuntimeSettings.mockSystemIn = true; 
-    org.evosuite.runtime.RuntimeSettings.sandboxMode = org.evosuite.runtime.sandbox.Sandbox.SandboxMode.RECOMMENDED; 
-    org.evosuite.runtime.sandbox.Sandbox.initializeSecurityManagerForSUT(); 
+    org.evosuite.runtime.RuntimeSettings.sandboxMode = SandboxMode.RECOMMENDED;
+    Sandbox.initializeSecurityManagerForSUT();
     org.evosuite.runtime.classhandling.JDKClassResetter.init();
     setSystemProperties();
     initializeClasses();
@@ -42,7 +42,7 @@ public class StringUtil_ESTest_scaffolding {
     threadStopper.storeCurrentThreads();
     threadStopper.startRecordingTime();
     org.evosuite.runtime.jvm.ShutdownHookHandler.getInstance().initHandler(); 
-    org.evosuite.runtime.sandbox.Sandbox.goingToExecuteSUTCode(); 
+    Sandbox.goingToExecuteSUTCode();
     org.evosuite.runtime.GuiSupport.setHeadless(); 
     org.evosuite.runtime.Runtime.getInstance().resetRuntime(); 
     org.evosuite.runtime.agent.InstrumentingAgent.activate(); 
@@ -54,7 +54,7 @@ public class StringUtil_ESTest_scaffolding {
     org.evosuite.runtime.jvm.ShutdownHookHandler.getInstance().safeExecuteAddedHooks(); 
     org.evosuite.runtime.classhandling.JDKClassResetter.reset(); 
     resetClasses(); 
-    org.evosuite.runtime.sandbox.Sandbox.doneWithExecutingSUTCode(); 
+    Sandbox.doneWithExecutingSUTCode();
     org.evosuite.runtime.agent.InstrumentingAgent.deactivate(); 
     org.evosuite.runtime.GuiSupport.restoreHeadlessMode(); 
   } 

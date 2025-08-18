@@ -21,25 +21,16 @@ package org.apache.openjpa.util;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.VarHandle;
 
-import org.apache.openjpa.lib.util.SizedMap;
 import org.apache.openjpa.lib.util.concurrent.ConcurrentHashMap;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.MockedConstruction;
-import org.mockito.junit.MockitoJUnitRunner;
-import org.mockito.stubbing.Answer;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.mockito.Mockito.*;
-
-@RunWith(MockitoJUnitRunner.class)
 public class CacheMap_MutationCoverage_Test {
 
     private CacheMap cacheMap;

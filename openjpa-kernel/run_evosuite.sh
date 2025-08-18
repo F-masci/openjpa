@@ -13,14 +13,10 @@
 #../openjpa-jdbc/target/classes
 #../openjpa-persistence/target/classes
 #../openjpa-persistence-jdbc/target/classes
-#../openjpa-examples/target/classes
-#../openjpa-project/target/classes
-#../openjpa-tools/target/classes
 
 java -Xmx4G -jar /home/fmasci/Programmi/evosuite-1.2.0.jar \
-      -class org.apache.openjpa.lib.util.concurrent.ConcurrentReferenceHashMap \
-      -projectCP target/classes:$(cat cp.txt) \
+      -class org.apache.openjpa.util.ConcurrentHashMap \
+      -projectCP openjpa-kernel/target/classes:openjpa-lib/target/classes:openjpa-kernel/target/classes:openjpa-jdbc/target/classes:openjpa-persistence/target/classes:openjpa-persistence-jdbc/target/classes:$(cat cp.txt) \
       -Dsandbox=false \
-      -Dsearch_budget=60 \
-      -seed 1755472713524 \
-      -Duse_separate_classloader=false
+      -Dsearch_budget=20 \
+      -criterion "line:branch"
