@@ -24,7 +24,6 @@ import org.junit.*;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Random;
 import java.util.Set;
 
 public class ConcurrentReferenceHashMap_BranchCoverage_Test {
@@ -91,7 +90,7 @@ public class ConcurrentReferenceHashMap_BranchCoverage_Test {
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void resetRandoms() throws Exception {
         // Ripristina i valori random
         Field randomsField = ConcurrentReferenceHashMap.class.getDeclaredField("RANDOMS");
         randomsField.setAccessible(true);
@@ -198,20 +197,21 @@ public class ConcurrentReferenceHashMap_BranchCoverage_Test {
         Assert.assertSame(value2, concurrentReferenceHashMap.get(key2));
         Assert.assertSame(value3, concurrentReferenceHashMap.get(key3));
 
-        // Rimuovo la terza chiave e verifica che non sia più presente
-        concurrentReferenceHashMap.remove(key3);
-        Assert.assertFalse(concurrentReferenceHashMap.containsKey(key3));
-        Assert.assertFalse(concurrentReferenceHashMap.containsValue(value3));
-
         // Rimuove la prima chiave e verifica che non sia più presente
-        concurrentReferenceHashMap.remove(key1);
+        Assert.assertSame(value1, concurrentReferenceHashMap.remove(key1));
         Assert.assertFalse(concurrentReferenceHashMap.containsKey(key1));
         Assert.assertFalse(concurrentReferenceHashMap.containsValue(value1));
 
         // Rimuove la seconda chiave e verifica che non sia più presente
-        concurrentReferenceHashMap.remove(key2);
+        Assert.assertSame(value2, concurrentReferenceHashMap.remove(key2));
         Assert.assertFalse(concurrentReferenceHashMap.containsKey(key2));
         Assert.assertFalse(concurrentReferenceHashMap.containsValue(value2));
+
+        // Rimuovo la terza chiave e verifica che non sia più presente
+        Assert.assertSame(value3, concurrentReferenceHashMap.remove(key3));
+        Assert.assertFalse(concurrentReferenceHashMap.containsKey(key3));
+        Assert.assertFalse(concurrentReferenceHashMap.containsValue(value3));
+        Assert.assertNull(concurrentReferenceHashMap.get(key3));
     }
 
     @Test
@@ -363,6 +363,9 @@ public class ConcurrentReferenceHashMap_BranchCoverage_Test {
         // Aggiungo una chiave null
         concurrentReferenceHashMap.put(null, "nullValue");
 
+        // Verifico che la mappa contenga la chiave null
+        Assert.assertTrue("Map should contain null key", concurrentReferenceHashMap.containsKey(null));
+
         // Modifico il tipo di riferimento per le chiavi
         Field keyTypeField = ConcurrentReferenceHashMap.class.getDeclaredField("keyType");
         keyTypeField.setAccessible(true);
@@ -381,7 +384,7 @@ public class ConcurrentReferenceHashMap_BranchCoverage_Test {
             Assert.assertEquals("value" + i, concurrentReferenceHashMap.get("key" + i));
         }
 
-        // Verifico che la mappa contenga la chiave null
+        // Verifico che la mappa non contenga la chiave null
         Assert.assertFalse("Map should not contain null key", concurrentReferenceHashMap.containsKey(null));
         Assert.assertFalse("Map should not contain null value", concurrentReferenceHashMap.containsValue("nullValue"));
         Assert.assertNull(concurrentReferenceHashMap.get(null));
@@ -437,6 +440,247 @@ public class ConcurrentReferenceHashMap_BranchCoverage_Test {
         Assert.assertTrue("Table should be resized after rehash", concurrentReferenceHashMap.capacity() > initialSize);
         Assert.assertEquals("Table should contain entries after rehash", validKey, concurrentReferenceHashMap.size());
 
+    }
+
+    @Test
+    public void testConcurrentReferenceHashMap_put_01a() throws Exception {
+
+        int validKey = 1_000;
+
+        concurrentReferenceHashMap = new ConcurrentReferenceHashMap(
+            AbstractReferenceMap.ReferenceStrength.HARD,
+            AbstractReferenceMap.ReferenceStrength.WEAK,
+            10, // Dimensione iniziale della tabella
+            0.75f // Fattore di carico
+        );
+
+        // Verifica che la mappa sia inizialmente vuota
+        Assert.assertTrue(concurrentReferenceHashMap.isEmpty());
+
+        // La dimensione della mappa aumenta ogni volta di size*2+1
+        // quando viene superato il limite di load factor.
+        // Mi aspetto quindi i seguenti ridimensionamenti:
+        // 10 -> 21: raggiunte 8 entry
+        // 21 -> 43: raggiunte 16 entry
+        // 43 -> 87: raggiunte 33 entry
+        // 87 -> 175: raggiunte 66 entry
+        // 175 -> 351: raggiunte 132 entry
+        // 351 -> 703: raggiunte 264 entry
+        // 703 -> 1407: raggiunte 528 entry
+        //
+        // Aggiungo un numero di chiavi che superi il limite
+        for(int i = 0; i < validKey; i++) {
+            concurrentReferenceHashMap.put("key" + i, "value" + i);
+            if(concurrentReferenceHashMap.size() == 8) Assert.assertEquals(21, concurrentReferenceHashMap.capacity());
+            else if(concurrentReferenceHashMap.size() == 16) Assert.assertEquals(43, concurrentReferenceHashMap.capacity());
+            else if(concurrentReferenceHashMap.size() == 33) Assert.assertEquals(87, concurrentReferenceHashMap.capacity());
+            else if(concurrentReferenceHashMap.size() == 66) Assert.assertEquals(175, concurrentReferenceHashMap.capacity());
+            else if(concurrentReferenceHashMap.size() == 132) Assert.assertEquals(351, concurrentReferenceHashMap.capacity());
+            else if(concurrentReferenceHashMap.size() == 264) Assert.assertEquals(703, concurrentReferenceHashMap.capacity());
+            else if(concurrentReferenceHashMap.size() == 528) Assert.assertEquals(1407, concurrentReferenceHashMap.capacity());
+        }
+
+        // Verifico che la mappa contenga le chiavi valide
+        for(int i = 0; i < validKey; i++) {
+            Assert.assertTrue("Map should contain key: key" + i, concurrentReferenceHashMap.containsKey("key" + i));
+            Assert.assertTrue("Map should contain value: value" + i, concurrentReferenceHashMap.containsValue("value" + i));
+            Assert.assertEquals("value" + i, concurrentReferenceHashMap.get("key" + i));
+        }
+
+        // Verifico la dimensione della mappa
+        Assert.assertEquals("Map should contain " + validKey + " entries", validKey, concurrentReferenceHashMap.size());
+        Assert.assertEquals("Map should have resized correctly", 1407, concurrentReferenceHashMap.capacity());
+
+        // Aggiungo nuovamente le chiavi ma con valori diversi
+        for(int i = 0; i < validKey; i++) {
+            Assert.assertEquals("value" + i, concurrentReferenceHashMap.put("key" + i, "newValue" + i));
+        }
+
+        System.gc(); // Forzo la garbage collection per rimuovere eventuali riferimenti deboli
+
+        // Verifico che la dimensione della mappa non sia cambiata
+        Assert.assertEquals("Map should still contain " + validKey + " entries", validKey, concurrentReferenceHashMap.size());
+        Assert.assertEquals("Map should still have resized correctly", 1407, concurrentReferenceHashMap.capacity());
+
+        concurrentReferenceHashMap.clear();
+
+        // Verifico che la mappa sia vuota dopo il clear
+        Assert.assertTrue("Map should be empty after clear", concurrentReferenceHashMap.isEmpty());
+        Assert.assertEquals("Map should have size 0 after clear", 0, concurrentReferenceHashMap.size());
+        Assert.assertEquals("Map should have capacity 1407 after clear", 1407, concurrentReferenceHashMap.capacity());
+
+    }
+
+    @Test
+    public void testConcurrentReferenceHashMap_put_01b() throws Exception {
+
+        int validKey = 1_000;
+
+        concurrentReferenceHashMap = new ConcurrentReferenceHashMap(
+                AbstractReferenceMap.ReferenceStrength.HARD,
+                AbstractReferenceMap.ReferenceStrength.WEAK,
+                10, // Dimensione iniziale della tabella
+                0.75f // Fattore di carico
+        );
+
+        // Verifica che la mappa sia inizialmente vuota
+        Assert.assertTrue(concurrentReferenceHashMap.isEmpty());
+
+        // La dimensione della mappa aumenta ogni volta di size*2+1
+        // quando viene superato il limite di load factor.
+        // Mi aspetto quindi i seguenti ridimensionamenti:
+        // 10 -> 21: raggiunte 8 entry
+        // 21 -> 43: raggiunte 16 entry
+        // 43 -> 87: raggiunte 33 entry
+        // 87 -> 175: raggiunte 66 entry
+        // 175 -> 351: raggiunte 132 entry
+        // 351 -> 703: raggiunte 264 entry
+        // 703 -> 1407: raggiunte 528 entry
+        //
+        // Aggiungo un numero di chiavi che superi il limite
+        for(int i = 0; i < validKey; i++) {
+            concurrentReferenceHashMap.put("key" + i, "value" + i);
+            if(concurrentReferenceHashMap.size() == 8) Assert.assertEquals(21, concurrentReferenceHashMap.capacity());
+            else if(concurrentReferenceHashMap.size() == 16) Assert.assertEquals(43, concurrentReferenceHashMap.capacity());
+            else if(concurrentReferenceHashMap.size() == 33) Assert.assertEquals(87, concurrentReferenceHashMap.capacity());
+            else if(concurrentReferenceHashMap.size() == 66) Assert.assertEquals(175, concurrentReferenceHashMap.capacity());
+            else if(concurrentReferenceHashMap.size() == 132) Assert.assertEquals(351, concurrentReferenceHashMap.capacity());
+            else if(concurrentReferenceHashMap.size() == 264) Assert.assertEquals(703, concurrentReferenceHashMap.capacity());
+            else if(concurrentReferenceHashMap.size() == 528) Assert.assertEquals(1407, concurrentReferenceHashMap.capacity());
+        }
+
+        // Verifico che la mappa contenga le chiavi valide
+        for(int i = 0; i < validKey; i++) {
+            Assert.assertTrue("Map should contain key: key" + i, concurrentReferenceHashMap.containsKey("key" + i));
+            Assert.assertTrue("Map should contain value: value" + i, concurrentReferenceHashMap.containsValue("value" + i));
+            Assert.assertEquals("value" + i, concurrentReferenceHashMap.get("key" + i));
+        }
+
+        // Verifico la dimensione della mappa
+        Assert.assertEquals("Map should contain " + validKey + " entries", validKey, concurrentReferenceHashMap.size());
+        Assert.assertEquals("Map should have resized correctly", 1407, concurrentReferenceHashMap.capacity());
+
+        // Aggiungo nuovamente le chiavi ma con valori diversi
+        for(int i = 0; i < validKey; i++) {
+            Assert.assertEquals("value" + i, concurrentReferenceHashMap.put("key" + i, "newValue" + i));
+        }
+
+        // Aggiungo chiavi differenti
+        for(int i = 0; i < validKey; i++) {
+            Assert.assertNull(concurrentReferenceHashMap.put("anotherKey" + i, "anotherValue" + i));
+        }
+
+        System.gc(); // Forzo la garbage collection per rimuovere eventuali riferimenti deboli
+
+        // Verifico che la dimensione della mappa non sia cambiata
+        Assert.assertEquals("Map should still contain " + validKey*2 + " entries", validKey*2, concurrentReferenceHashMap.size());
+        Assert.assertEquals("Map should still have resized correctly", 1407*2+1, concurrentReferenceHashMap.capacity());
+
+        for(int i = 0; i < validKey; i++) {
+            concurrentReferenceHashMap.remove("key" + i);
+        }
+
+        // Verifico che la mappa sia vuota dopo il clear
+        Assert.assertTrue("Map should be empty after clear", concurrentReferenceHashMap.isEmpty());
+        Assert.assertEquals("Map should have size 0 after clear", 0, concurrentReferenceHashMap.size());
+        Assert.assertEquals("Map should have capacity 1407 after clear", 1407*2+1, concurrentReferenceHashMap.capacity());
+
+    }
+
+    @Test
+    public void testConcurrentReferenceHashMap_put_01c() throws Exception {
+
+        int validKey = 1_000;
+
+        concurrentReferenceHashMap = new ConcurrentReferenceHashMap(
+                AbstractReferenceMap.ReferenceStrength.WEAK,
+                AbstractReferenceMap.ReferenceStrength.HARD,
+                10, // Dimensione iniziale della tabella
+                0.75f // Fattore di carico
+        );
+
+        // Verifica che la mappa sia inizialmente vuota
+        Assert.assertTrue(concurrentReferenceHashMap.isEmpty());
+
+        // La dimensione della mappa aumenta ogni volta di size*2+1
+        // quando viene superato il limite di load factor.
+        // Mi aspetto quindi i seguenti ridimensionamenti:
+        // 10 -> 21: raggiunte 8 entry
+        // 21 -> 43: raggiunte 16 entry
+        // 43 -> 87: raggiunte 33 entry
+        // 87 -> 175: raggiunte 66 entry
+        // 175 -> 351: raggiunte 132 entry
+        // 351 -> 703: raggiunte 264 entry
+        // 703 -> 1407: raggiunte 528 entry
+        //
+        // Aggiungo un numero di chiavi che superi il limite
+        for(int i = 0; i < validKey; i++) {
+            concurrentReferenceHashMap.put("key" + i, "value" + i);
+            if(concurrentReferenceHashMap.size() == 8) Assert.assertEquals(21, concurrentReferenceHashMap.capacity());
+            else if(concurrentReferenceHashMap.size() == 16) Assert.assertEquals(43, concurrentReferenceHashMap.capacity());
+            else if(concurrentReferenceHashMap.size() == 33) Assert.assertEquals(87, concurrentReferenceHashMap.capacity());
+            else if(concurrentReferenceHashMap.size() == 66) Assert.assertEquals(175, concurrentReferenceHashMap.capacity());
+            else if(concurrentReferenceHashMap.size() == 132) Assert.assertEquals(351, concurrentReferenceHashMap.capacity());
+            else if(concurrentReferenceHashMap.size() == 264) Assert.assertEquals(703, concurrentReferenceHashMap.capacity());
+            else if(concurrentReferenceHashMap.size() == 528) Assert.assertEquals(1407, concurrentReferenceHashMap.capacity());
+        }
+
+        // Verifico che la mappa contenga le chiavi valide
+        for(int i = 0; i < validKey; i++) {
+            Assert.assertTrue("Map should contain key: key" + i, concurrentReferenceHashMap.containsKey("key" + i));
+            Assert.assertTrue("Map should contain value: value" + i, concurrentReferenceHashMap.containsValue("value" + i));
+            Assert.assertEquals("value" + i, concurrentReferenceHashMap.get("key" + i));
+        }
+
+        // Verifico la dimensione della mappa
+        Assert.assertEquals("Map should contain " + validKey + " entries", validKey, concurrentReferenceHashMap.size());
+        Assert.assertEquals("Map should have resized correctly", 1407, concurrentReferenceHashMap.capacity());
+
+        // Aggiungo nuovamente le chiavi ma con valori diversi
+        for(int i = 0; i < validKey; i++) {
+            Assert.assertEquals("value" + i, concurrentReferenceHashMap.put("key" + i, "newValue" + i));
+        }
+
+        // Aggiungo chiavi differenti
+        for(int i = 0; i < validKey; i++) {
+            Assert.assertNull(concurrentReferenceHashMap.put("anotherKey" + i, "anotherValue" + i));
+        }
+
+        System.gc(); // Forzo la garbage collection per rimuovere eventuali riferimenti deboli
+
+        // Verifico che la dimensione della mappa non sia cambiata
+        Assert.assertEquals("Map should still contain " + validKey*2 + " entries", validKey*2, concurrentReferenceHashMap.size());
+        Assert.assertEquals("Map should still have resized correctly", 1407*2+1, concurrentReferenceHashMap.capacity());
+
+        for(int i = 0; i < validKey; i++) {
+            concurrentReferenceHashMap.remove("key" + i);
+        }
+
+        // Verifico che la mappa sia vuota dopo il clear
+        Assert.assertTrue("Map should be empty after clear", concurrentReferenceHashMap.isEmpty());
+        Assert.assertEquals("Map should have size 0 after clear", 0, concurrentReferenceHashMap.size());
+        Assert.assertEquals("Map should have capacity 1407 after clear", 1407*2+1, concurrentReferenceHashMap.capacity());
+
+    }
+
+    @Test
+    public void testConcurrentReferenceHashMap_clone_01() throws Exception {
+
+        concurrentReferenceHashMap.put(key1, "value1");
+        concurrentReferenceHashMap.put(key2, "value2");
+        concurrentReferenceHashMap.put(key3, "value3");
+
+        ConcurrentReferenceHashMap map = (ConcurrentReferenceHashMap) concurrentReferenceHashMap.clone();
+
+        Assert.assertNotSame(concurrentReferenceHashMap, map);
+
+        // Verifica che siano uguali
+        Assert.assertEquals(concurrentReferenceHashMap.size(), map.size());
+        Assert.assertEquals(concurrentReferenceHashMap.capacity(), map.capacity());
+
+        Assert.assertEquals(concurrentReferenceHashMap.get(key1), map.get(key1));
+        Assert.assertEquals(concurrentReferenceHashMap.get(key2), map.get(key2));
+        Assert.assertEquals(concurrentReferenceHashMap.get(key3), map.get(key3));
     }
 
 }

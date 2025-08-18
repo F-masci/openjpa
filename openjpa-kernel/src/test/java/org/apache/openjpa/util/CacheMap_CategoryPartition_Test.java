@@ -125,7 +125,7 @@ public class CacheMap_CategoryPartition_Test {
     public void testCacheMap_putAll_01() {
         // Mappa vuota
         Map<Object, Object> emptyMap = Mockito.mock(Map.class);
-        Mockito.when(emptyMap.isEmpty()).thenReturn(true);
+        Mockito.lenient().when(emptyMap.isEmpty()).thenReturn(true);
         cacheMap.putAll(emptyMap, false);
         Assert.assertTrue("CacheMap should be empty", cacheMap.isEmpty());
     }
@@ -139,11 +139,11 @@ public class CacheMap_CategoryPartition_Test {
 
         Object key = new Object();
         Object value = new Object();
-        Mockito.when(smallMap.size()).thenReturn(1);
-        Mockito.when(smallMap.get(key)).thenReturn(value);
-        Mockito.when(smallMap.containsKey(key)).thenReturn(true);
-        Mockito.when(smallMap.isEmpty()).thenReturn(false);
-        Mockito.when(smallMap.entrySet()).thenReturn(Collections.singletonMap(key, value).entrySet());
+        Mockito.lenient().when(smallMap.size()).thenReturn(1);
+        Mockito.lenient().when(smallMap.get(key)).thenReturn(value);
+        Mockito.lenient().when(smallMap.containsKey(key)).thenReturn(true);
+        Mockito.lenient().when(smallMap.isEmpty()).thenReturn(false);
+        Mockito.lenient().when(smallMap.entrySet()).thenReturn(Collections.singletonMap(key, value).entrySet());
 
         cacheMap.putAll(smallMap, true);
         Assert.assertEquals("CacheMap size should be 1", 1, cacheMap.size());
@@ -151,7 +151,7 @@ public class CacheMap_CategoryPartition_Test {
 
         // Verifica che il valore sia stato aggiornato
         Object newValue = new Object();
-        Mockito.when(smallMap.get(key)).thenReturn(newValue);
+        Mockito.lenient().when(smallMap.get(key)).thenReturn(newValue);
         Mockito.when(smallMap.entrySet()).thenReturn(Collections.singletonMap(key, newValue).entrySet());
 
         cacheMap.putAll(smallMap, true);
