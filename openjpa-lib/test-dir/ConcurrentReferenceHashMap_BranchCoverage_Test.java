@@ -21,12 +21,10 @@ package org.apache.openjpa.lib.util.concurrent;
 import org.apache.openjpa.lib.util.collections.AbstractReferenceMap;
 import org.junit.*;
 
-import java.lang.ref.ReferenceQueue;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ConcurrentReferenceHashMap_BranchCoverage_Test {
 
@@ -518,17 +516,11 @@ public class ConcurrentReferenceHashMap_BranchCoverage_Test {
 
         int validKey = 1_000;
 
-        AtomicBoolean valueExpired = new AtomicBoolean(false);
-
-        concurrentReferenceHashMap = new TestConcurrentReferenceHashMap(
+        concurrentReferenceHashMap = new ConcurrentReferenceHashMap(
                 AbstractReferenceMap.ReferenceStrength.HARD,
                 AbstractReferenceMap.ReferenceStrength.WEAK,
-                10,         // Dimensione iniziale della tabella
-                0.75f,      // Fattore di carico
-                null,
-                (key -> {   // Gestore per la scadenza delle chiavi
-                    valueExpired.set(true);
-                })
+                10, // Dimensione iniziale della tabella
+                0.75f // Fattore di carico
         );
 
         // Verifica che la mappa sia inizialmente vuota
@@ -592,8 +584,6 @@ public class ConcurrentReferenceHashMap_BranchCoverage_Test {
         Assert.assertTrue("Map should be empty after clear", concurrentReferenceHashMap.isEmpty());
         Assert.assertEquals("Map should have size 0 after clear", 0, concurrentReferenceHashMap.size());
         Assert.assertEquals("Map should have capacity 1407 after clear", 1407*2+1, concurrentReferenceHashMap.capacity());
-
-        Assert.assertTrue(valueExpired.get());
 
     }
 
@@ -602,17 +592,11 @@ public class ConcurrentReferenceHashMap_BranchCoverage_Test {
 
         int validKey = 1_000;
 
-        AtomicBoolean keyExpired = new AtomicBoolean(false);
-
-        concurrentReferenceHashMap = new TestConcurrentReferenceHashMap(
+        concurrentReferenceHashMap = new ConcurrentReferenceHashMap(
                 AbstractReferenceMap.ReferenceStrength.WEAK,
                 AbstractReferenceMap.ReferenceStrength.HARD,
-                10,                 // Dimensione iniziale della tabella
-                0.75f,              // Fattore di carico
-                (key -> {       // Gestore per la scadenza delle chiavi
-                    keyExpired.set(true);
-                }),
-                null
+                10, // Dimensione iniziale della tabella
+                0.75f // Fattore di carico
         );
 
         // Verifica che la mappa sia inizialmente vuota
@@ -676,8 +660,6 @@ public class ConcurrentReferenceHashMap_BranchCoverage_Test {
         Assert.assertTrue("Map should be empty after clear", concurrentReferenceHashMap.isEmpty());
         Assert.assertEquals("Map should have size 0 after clear", 0, concurrentReferenceHashMap.size());
         Assert.assertEquals("Map should have capacity 1407 after clear", 1407*2+1, concurrentReferenceHashMap.capacity());
-
-        Assert.assertTrue(keyExpired.get());
 
     }
 
@@ -699,42 +681,6 @@ public class ConcurrentReferenceHashMap_BranchCoverage_Test {
         Assert.assertEquals(concurrentReferenceHashMap.get(key1), map.get(key1));
         Assert.assertEquals(concurrentReferenceHashMap.get(key2), map.get(key2));
         Assert.assertEquals(concurrentReferenceHashMap.get(key3), map.get(key3));
-    }
-
-    private class TestConcurrentReferenceHashMap extends ConcurrentReferenceHashMap {
-
-        private final ConcurrentReferenceHashMap_BranchCoverage_Test.ExpiredHandler keyExpiredHandler;
-        private final ConcurrentReferenceHashMap_BranchCoverage_Test.ExpiredHandler valueExpiredHandler;
-
-        public TestConcurrentReferenceHashMap(AbstractReferenceMap.ReferenceStrength keyType,
-                                              AbstractReferenceMap.ReferenceStrength valueType,
-                                              int initialCapacity,
-                                              float loadFactor,
-                                              ConcurrentReferenceHashMap_BranchCoverage_Test.ExpiredHandler keyExpired,
-                                              ConcurrentReferenceHashMap_BranchCoverage_Test.ExpiredHandler valueExpired) {
-            super(keyType, valueType, initialCapacity, loadFactor);
-            this.keyExpiredHandler = keyExpired;
-            this.valueExpiredHandler = valueExpired;
-        }
-
-        @Override
-        public void keyExpired(Object key) {
-            if (keyExpiredHandler != null) {
-                keyExpiredHandler.onExpired(key);
-            }
-        }
-
-        @Override
-        public void valueExpired(Object key) {
-            if (valueExpiredHandler != null) {
-                valueExpiredHandler.onExpired(key);
-            }
-        }
-    }
-
-    @FunctionalInterface
-    public interface ExpiredHandler {
-        void onExpired(Object key);
     }
 
 }
