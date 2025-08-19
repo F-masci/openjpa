@@ -48,7 +48,4 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
-          mvn -B verify org.sonarsource.scanner.maven:sonar \
-            -Dsonar.projectKey=F-masci_openjpa \
-            -Dsonar.organization=F-masci \
-            -Dsonar.coverage.jacoco.xmlReportPaths=target/reports/jacoco-aggregate/jacoco.xml
+          mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
