@@ -21,14 +21,17 @@ package org.apache.openjpa.util;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.VarHandle;
 
+import org.apache.openjpa.lib.util.collections.AbstractReferenceMap;
 import org.apache.openjpa.lib.util.concurrent.ConcurrentHashMap;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.apache.openjpa.lib.util.concurrent.ConcurrentReferenceHashMap;
+import org.junit.*;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class CacheMap_MutationCoverage_Test {
@@ -37,6 +40,25 @@ public class CacheMap_MutationCoverage_Test {
 
     Map<Object, Object> realMap;
     Map<Object, Object> nullMap;
+
+    private static double[] originalRandoms;
+
+    @BeforeClass
+    public static void saveRandoms() throws Exception {
+        // Salva i valori random iniziali
+        Field randomsField = ConcurrentHashMap.class.getDeclaredField("RANDOMS");
+        randomsField.setAccessible(true);
+        originalRandoms = Arrays.copyOf((double[]) randomsField.get(null), ((double[]) randomsField.get(null)).length);
+    }
+
+    @After
+    public void resetRandoms() throws Exception {
+        // Ripristina i valori random
+        Field randomsField = ConcurrentHashMap.class.getDeclaredField("RANDOMS");
+        randomsField.setAccessible(true);
+        double[] randoms = (double[]) randomsField.get(null);
+        randoms = Arrays.copyOf(originalRandoms, originalRandoms.length);
+    }
 
     @Before
     public void setup() {
@@ -381,6 +403,64 @@ public class CacheMap_MutationCoverage_Test {
         Assert.assertEquals(0, cacheMap.size());
         Assert.assertEquals(10, keyDeleted.get());
 
+    }
+
+    // mutation line 176
+    /*@Test
+    public void testCacheMap_mutationCoverage_06() throws Exception {
+
+        int softMapKey = 1_000_000;
+
+        AtomicBoolean valueExpired = new AtomicBoolean(false);
+
+        // Crea una CacheMap con maxSize 10
+        cacheMap = new TestCacheMap(false, 10, null, (Object key, Object value, boolean expired) -> {
+            if(key != null && value == null && expired) valueExpired.set(true);
+        });
+
+        ConcurrentReferenceHashMap softMap = (ConcurrentReferenceHashMap) cacheMap.softMap;
+
+        // Aggiungo un numero di chiavi che superi il limite
+        // che finiranno nella soft map
+        for(int i = 0; i < softMapKey; i++) {
+            softMap.put("key" + i, new byte[10_000]);
+            if(i % 100_000 == 0) {
+                System.gc(); // Forzo la garbage collection per rimuovere eventuali riferimenti deboli
+                Thread.sleep(50); // Attendo un po' per garantire che la GC abbia effetto
+            }
+        }
+
+        Assert.assertTrue(valueExpired.get());
+    }*/
+
+    // mutation line 159
+    @Test
+    public void testCacheMap_mutationCoverage_07() throws Exception {
+
+        AtomicInteger entryRemoved = new AtomicInteger(0);
+
+        // Forza una chiave specifica a essere rimossa
+        // per evitare problemi di randomizzazione
+        // La chiave è
+        Field randomsField = ConcurrentHashMap.class.getDeclaredField("RANDOMS");
+        randomsField.setAccessible(true);
+        double[] randoms = (double[]) randomsField.get(null);
+        Arrays.fill(randoms, 0.5); // Imposta un valore specifico per la randomizzazione
+
+        // Crea una CacheMap con maxSize 10
+        cacheMap = new TestCacheMap(false, 5, null, (Object key, Object value, boolean expired) -> {
+            Assert.assertEquals("key9", key);
+            entryRemoved.getAndIncrement();
+        });
+
+        cacheMap.setSoftReferenceSize(5);
+
+        // Aggiungo un numero di chiavi che superi il limite
+        for(int i = 0; i < 11; i++) {
+            cacheMap.put("key" + i, "value" + i);
+        }
+
+        Assert.assertEquals(1, entryRemoved.get());
     }
 
     private class TestCacheMap extends CacheMap {
