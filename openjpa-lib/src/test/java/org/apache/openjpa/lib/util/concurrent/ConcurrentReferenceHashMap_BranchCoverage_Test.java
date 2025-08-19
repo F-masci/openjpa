@@ -331,13 +331,13 @@ public class ConcurrentReferenceHashMap_BranchCoverage_Test {
         this.addNullEntry(concurrentReferenceHashMap, 1);
 
         // Forzo i seguenti valori random
-        // 0/11 => il prossimo indice sarà 0
+        // 0/10 => il prossimo indice sarà 0
         setRandomValue(concurrentReferenceHashMap, 0, 0.0);
-        // 1/11 => il prossimo indice sarà 1
+        // 1/10 => il prossimo indice sarà 1
         setRandomValue(concurrentReferenceHashMap, 1, 1.0 / fixedTableSize);
-        // 10/11 => il prossimo indice sarà 10
+        // 9/10 => il prossimo indice sarà 9
         setRandomValue(concurrentReferenceHashMap, 2, 9.0 / fixedTableSize);
-        // 9/11 => il prossimo indice sarà 9
+        // 8/10 => il prossimo indice sarà 8
         setRandomValue(concurrentReferenceHashMap, 3, 8.0 / fixedTableSize);
 
         Assert.assertNull(concurrentReferenceHashMap.removeRandom());
@@ -472,7 +472,7 @@ public class ConcurrentReferenceHashMap_BranchCoverage_Test {
         //
         // Aggiungo un numero di chiavi che superi il limite
         for(int i = 0; i < validKey; i++) {
-            concurrentReferenceHashMap.put("key" + i, "value" + i);
+            Assert.assertNull(concurrentReferenceHashMap.put("key" + i, "value" + i));
             if(concurrentReferenceHashMap.size() == 8) Assert.assertEquals(21, concurrentReferenceHashMap.capacity());
             else if(concurrentReferenceHashMap.size() == 16) Assert.assertEquals(43, concurrentReferenceHashMap.capacity());
             else if(concurrentReferenceHashMap.size() == 33) Assert.assertEquals(87, concurrentReferenceHashMap.capacity());
@@ -496,6 +496,9 @@ public class ConcurrentReferenceHashMap_BranchCoverage_Test {
         // Aggiungo nuovamente le chiavi ma con valori diversi
         for(int i = 0; i < validKey; i++) {
             Assert.assertEquals("value" + i, concurrentReferenceHashMap.put("key" + i, "newValue" + i));
+            Assert.assertEquals("newValue" + i, concurrentReferenceHashMap.get("key" + i));
+            Assert.assertTrue(concurrentReferenceHashMap.containsKey("key" + i));
+            Assert.assertTrue(concurrentReferenceHashMap.containsValue("newValue" + i));
         }
 
         System.gc(); // Forzo la garbage collection per rimuovere eventuali riferimenti deboli
@@ -571,11 +574,17 @@ public class ConcurrentReferenceHashMap_BranchCoverage_Test {
         // Aggiungo nuovamente le chiavi ma con valori diversi
         for(int i = 0; i < validKey; i++) {
             Assert.assertEquals("value" + i, concurrentReferenceHashMap.put("key" + i, "newValue" + i));
+            Assert.assertEquals("newValue" + i, concurrentReferenceHashMap.get("key" + i));
+            Assert.assertTrue(concurrentReferenceHashMap.containsKey("key" + i));
+            Assert.assertTrue(concurrentReferenceHashMap.containsValue("newValue" + i));
         }
 
         // Aggiungo chiavi differenti
         for(int i = 0; i < validKey; i++) {
             Assert.assertNull(concurrentReferenceHashMap.put("anotherKey" + i, "anotherValue" + i));
+            Assert.assertEquals("anotherValue" + i, concurrentReferenceHashMap.get("anotherKey" + i));
+            Assert.assertTrue(concurrentReferenceHashMap.containsKey("anotherKey" + i));
+            Assert.assertTrue(concurrentReferenceHashMap.containsValue("anotherValue" + i));
         }
 
         System.gc(); // Forzo la garbage collection per rimuovere eventuali riferimenti deboli
@@ -655,11 +664,17 @@ public class ConcurrentReferenceHashMap_BranchCoverage_Test {
         // Aggiungo nuovamente le chiavi ma con valori diversi
         for(int i = 0; i < validKey; i++) {
             Assert.assertEquals("value" + i, concurrentReferenceHashMap.put("key" + i, "newValue" + i));
+            Assert.assertEquals("newValue" + i, concurrentReferenceHashMap.get("key" + i));
+            Assert.assertTrue(concurrentReferenceHashMap.containsKey("key" + i));
+            Assert.assertTrue(concurrentReferenceHashMap.containsValue("newValue" + i));
         }
 
         // Aggiungo chiavi differenti
         for(int i = 0; i < validKey; i++) {
             Assert.assertNull(concurrentReferenceHashMap.put("anotherKey" + i, "anotherValue" + i));
+            Assert.assertEquals("anotherValue" + i, concurrentReferenceHashMap.get("anotherKey" + i));
+            Assert.assertTrue(concurrentReferenceHashMap.containsKey("anotherKey" + i));
+            Assert.assertTrue(concurrentReferenceHashMap.containsValue("anotherValue" + i));
         }
 
         System.gc(); // Forzo la garbage collection per rimuovere eventuali riferimenti deboli

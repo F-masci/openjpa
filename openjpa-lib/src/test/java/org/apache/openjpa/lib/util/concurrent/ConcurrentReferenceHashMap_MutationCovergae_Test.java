@@ -37,20 +37,6 @@ public class ConcurrentReferenceHashMap_MutationCovergae_Test {
 
     private static double[] originalRandoms;
 
-    private void addNullEntry(ConcurrentReferenceHashMap map, int nEntries) throws Exception {
-        Field tableField = ConcurrentReferenceHashMap.class.getDeclaredField("table");
-        tableField.setAccessible(true);
-        Object[] table = (Object[]) tableField.get(map);
-
-        Field countField = ConcurrentReferenceHashMap.class.getDeclaredField("count");
-        countField.setAccessible(true);
-        countField.set(map, nEntries);
-
-        for (int i = 0; i < table.length; i++) {
-            table[i] = null;
-        }
-    }
-
     /**
      * Modifica i valori random della mappa.
      * @param map la mappa da cui prendere l'indice di partenza
@@ -152,6 +138,7 @@ public class ConcurrentReferenceHashMap_MutationCovergae_Test {
         setRandomValue(concurrentReferenceHashMap, 2, 0.9); // => mi aspetto come randomIndex 9
         setRandomValue(concurrentReferenceHashMap, 3, 0.3); // => mi aspetto come randomIndex 3
         setRandomValue(concurrentReferenceHashMap, 4, 0.3); // => mi aspetto come randomIndex 3
+        setRandomValue(concurrentReferenceHashMap, 5, 0.9); // => mi aspetto come randomIndex 9
 
         Field randomEntryField = ConcurrentReferenceHashMap.class.getDeclaredField("randomEntry");
         randomEntryField.setAccessible(true);
@@ -213,15 +200,13 @@ public class ConcurrentReferenceHashMap_MutationCovergae_Test {
         Assert.assertEquals("key9", e9.getKey());
         Assert.assertEquals("value9", e9.getValue());
 
-        // Verifica che la mappa non abbia rimosso l'elemento con chiave "key3"
-        Assert.assertTrue(concurrentReferenceHashMap.containsKey("key3"));
-        Assert.assertTrue(concurrentReferenceHashMap.containsValue("value3"));
-        Assert.assertEquals("value3", concurrentReferenceHashMap.get("key3"));
-
         int randomEntryNew = (int) randomEntryField.get(concurrentReferenceHashMap);
 
         // Verifica che il campo randomEntry sia stato aggiornato
         Assert.assertEquals(5, randomEntryNew - randomEntryOld);
+
+        // Verifica la dimensione della mappa
+        Assert.assertEquals(4, concurrentReferenceHashMap.size());
     }
 
     // line 493
@@ -318,6 +303,10 @@ public class ConcurrentReferenceHashMap_MutationCovergae_Test {
 
         // Verifica che il campo randomEntry sia stato aggiornato
         Assert.assertEquals(5, randomEntryNew - randomEntryOld);
+
+        // Verifica che la dimensione della mappa sia corretta
+        Assert.assertEquals(4, concurrentReferenceHashMap.size());
+
     }
 
     private class TestConcurrentReferenceHashMap extends ConcurrentReferenceHashMap {
