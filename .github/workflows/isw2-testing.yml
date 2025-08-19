@@ -18,6 +18,7 @@ jobs:
           java-version: '11'
           distribution: 'temurin'
           cache: maven
+
       - name: Install EvoSuite Runtime
         run: |
           wget https://github.com/EvoSuite/evosuite/releases/download/v1.2.0/evosuite-standalone-runtime-1.2.0.jar
@@ -27,5 +28,23 @@ jobs:
             -DgroupId=org.evosuite \
             -Dversion=1.2.0 \
             -Dpackaging=jar
+
+      - name: Cache SonarQube packages
+          uses: actions/cache@v4
+          with:
+            path: ~/.sonar/cache
+            key: ${{ runner.os }}-sonar
+            restore-keys: ${{ runner.os }}-sonar
+            - name: Cache Maven packages
+              uses: actions/cache@v4
+              with:
+                path: ~/.m2
+                key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+                restore-keys: ${{ runner.os }}-m2
+
       - name: Test with Maven
-        run: mvn -B clean test
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+          -Dsonar.projectKey=F-masci_openjpa \
+          -Dsonar.coverage.jacoco.xmlReportPaths=coverage-reports/target/reports/jacoco-aggregate/jacoco.xml

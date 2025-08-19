@@ -95,6 +95,9 @@
     <jakarta.transaction-api.version>2.0.1</jakarta.transaction-api.version>
     <jakarta.validation-api.version>3.0.2</jakarta.validation-api.version>
     <jakarta.jms-api.version>3.1.0</jakarta.jms-api.version>
+
+    <!-- SonarQube properties -->
+    <sonar.organization>f-masci</sonar.organization>
   </properties>
   <licenses>
     <license>
@@ -170,6 +173,7 @@
     <module>openjpa-tools</module>
     <module>openjpa-features</module>
     <module>openjpa-junit5</module>
+    <module>coverage-reports</module>
   </modules>
   <profiles>
     <!-- ================ -->
