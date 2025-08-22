@@ -154,19 +154,6 @@ public class CacheMap_MutationCoverage_Test {
     // mutation line 159
     /*
      * Va in errore poiché la dimensione della soft reference é 0.
-     * Quando viene chiamata la remove, ritorna un errore dovuto a una
-     * divisione per zero.
-     *
-     *  java.lang.ArithmeticException: / by zero
-     *      at org.apache.openjpa.lib.util.concurrent.ConcurrentReferenceHashMap.remove(ConcurrentReferenceHashMap.java:456)
-     *      at org.apache.openjpa.util.CacheMap.remove(CacheMap.java:192)
-     *      at org.apache.openjpa.util.CacheMap.put(CacheMap.java:409)
-     *
-     * Per calcolare l'indice della tabella soft viene usato
-     *
-     *  int index = (hash & 0x7FFFFFFF) % tab.length;
-     *
-     * ma tab.length é 0.
      */
     /*@Test
     public void testCacheMap_mutationCoverage_03a() throws Exception {

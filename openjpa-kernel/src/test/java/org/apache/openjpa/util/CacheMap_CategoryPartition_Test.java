@@ -198,19 +198,6 @@ public class CacheMap_CategoryPartition_Test {
         Assert.assertSame("Object expected to be the same", value, cacheMap.get(key));
     }
 
-    // map: null
-    // replaceExisting: false
-    /*
-     * Test per verificare il comportamento quando la mappa da aggiungere è null.
-     * In questo caso, non dovrebbe causare errori e la CacheMap dovrebbe rimanere vuota.
-     */
-    /*@Test
-    public void testCacheMap_putAll_05() {
-        // Mappa nulla
-        cacheMap.putAll(null, false);
-        Assert.assertTrue("CacheMap should be empty", cacheMap.isEmpty());
-    }*/
-
     /* -- Metodo: remove -- */
 
     // Key: presente

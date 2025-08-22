@@ -25,7 +25,7 @@ import org.junit.Test;
 import java.util.Set;
 import java.util.Collection;
 
-public class CacheMapLLMTest {
+public class CacheMap_LLM_Test {
 
     private CacheMap cacheMap;
 

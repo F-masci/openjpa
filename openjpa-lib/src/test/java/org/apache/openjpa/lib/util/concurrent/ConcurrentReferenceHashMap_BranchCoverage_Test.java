@@ -718,15 +718,15 @@ public class ConcurrentReferenceHashMap_BranchCoverage_Test {
 
     private class TestConcurrentReferenceHashMap extends ConcurrentReferenceHashMap {
 
-        private final ConcurrentReferenceHashMap_BranchCoverage_Test.ExpiredHandler keyExpiredHandler;
-        private final ConcurrentReferenceHashMap_BranchCoverage_Test.ExpiredHandler valueExpiredHandler;
+        private final ExpiredHandler keyExpiredHandler;
+        private final ExpiredHandler valueExpiredHandler;
 
         public TestConcurrentReferenceHashMap(AbstractReferenceMap.ReferenceStrength keyType,
                                               AbstractReferenceMap.ReferenceStrength valueType,
                                               int initialCapacity,
                                               float loadFactor,
-                                              ConcurrentReferenceHashMap_BranchCoverage_Test.ExpiredHandler keyExpired,
-                                              ConcurrentReferenceHashMap_BranchCoverage_Test.ExpiredHandler valueExpired) {
+                                              ExpiredHandler keyExpired,
+                                              ExpiredHandler valueExpired) {
             super(keyType, valueType, initialCapacity, loadFactor);
             this.keyExpiredHandler = keyExpired;
             this.valueExpiredHandler = valueExpired;

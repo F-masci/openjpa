@@ -21,10 +21,12 @@ package org.apache.openjpa.lib.util.concurrent;
 import org.apache.openjpa.lib.util.collections.AbstractReferenceMap;
 import org.junit.*;
 
+import java.lang.ref.ReferenceQueue;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ConcurrentReferenceHashMap_BranchCoverage_Test {
 
@@ -329,13 +331,13 @@ public class ConcurrentReferenceHashMap_BranchCoverage_Test {
         this.addNullEntry(concurrentReferenceHashMap, 1);
 
         // Forzo i seguenti valori random
-        // 0/11 => il prossimo indice sarà 0
+        // 0/10 => il prossimo indice sarà 0
         setRandomValue(concurrentReferenceHashMap, 0, 0.0);
-        // 1/11 => il prossimo indice sarà 1
+        // 1/10 => il prossimo indice sarà 1
         setRandomValue(concurrentReferenceHashMap, 1, 1.0 / fixedTableSize);
-        // 10/11 => il prossimo indice sarà 10
+        // 9/10 => il prossimo indice sarà 9
         setRandomValue(concurrentReferenceHashMap, 2, 9.0 / fixedTableSize);
-        // 9/11 => il prossimo indice sarà 9
+        // 8/10 => il prossimo indice sarà 8
         setRandomValue(concurrentReferenceHashMap, 3, 8.0 / fixedTableSize);
 
         Assert.assertNull(concurrentReferenceHashMap.removeRandom());
@@ -470,7 +472,7 @@ public class ConcurrentReferenceHashMap_BranchCoverage_Test {
         //
         // Aggiungo un numero di chiavi che superi il limite
         for(int i = 0; i < validKey; i++) {
-            concurrentReferenceHashMap.put("key" + i, "value" + i);
+            Assert.assertNull(concurrentReferenceHashMap.put("key" + i, "value" + i));
             if(concurrentReferenceHashMap.size() == 8) Assert.assertEquals(21, concurrentReferenceHashMap.capacity());
             else if(concurrentReferenceHashMap.size() == 16) Assert.assertEquals(43, concurrentReferenceHashMap.capacity());
             else if(concurrentReferenceHashMap.size() == 33) Assert.assertEquals(87, concurrentReferenceHashMap.capacity());
@@ -494,6 +496,9 @@ public class ConcurrentReferenceHashMap_BranchCoverage_Test {
         // Aggiungo nuovamente le chiavi ma con valori diversi
         for(int i = 0; i < validKey; i++) {
             Assert.assertEquals("value" + i, concurrentReferenceHashMap.put("key" + i, "newValue" + i));
+            Assert.assertEquals("newValue" + i, concurrentReferenceHashMap.get("key" + i));
+            Assert.assertTrue(concurrentReferenceHashMap.containsKey("key" + i));
+            Assert.assertTrue(concurrentReferenceHashMap.containsValue("newValue" + i));
         }
 
         System.gc(); // Forzo la garbage collection per rimuovere eventuali riferimenti deboli
@@ -516,11 +521,17 @@ public class ConcurrentReferenceHashMap_BranchCoverage_Test {
 
         int validKey = 1_000;
 
-        concurrentReferenceHashMap = new ConcurrentReferenceHashMap(
+        AtomicBoolean valueExpired = new AtomicBoolean(false);
+
+        concurrentReferenceHashMap = new TestConcurrentReferenceHashMap(
                 AbstractReferenceMap.ReferenceStrength.HARD,
                 AbstractReferenceMap.ReferenceStrength.WEAK,
-                10, // Dimensione iniziale della tabella
-                0.75f // Fattore di carico
+                10,         // Dimensione iniziale della tabella
+                0.75f,      // Fattore di carico
+                null,
+                (key -> {   // Gestore per la scadenza delle chiavi
+                    valueExpired.set(true);
+                })
         );
 
         // Verifica che la mappa sia inizialmente vuota
@@ -563,11 +574,17 @@ public class ConcurrentReferenceHashMap_BranchCoverage_Test {
         // Aggiungo nuovamente le chiavi ma con valori diversi
         for(int i = 0; i < validKey; i++) {
             Assert.assertEquals("value" + i, concurrentReferenceHashMap.put("key" + i, "newValue" + i));
+            Assert.assertEquals("newValue" + i, concurrentReferenceHashMap.get("key" + i));
+            Assert.assertTrue(concurrentReferenceHashMap.containsKey("key" + i));
+            Assert.assertTrue(concurrentReferenceHashMap.containsValue("newValue" + i));
         }
 
         // Aggiungo chiavi differenti
         for(int i = 0; i < validKey; i++) {
             Assert.assertNull(concurrentReferenceHashMap.put("anotherKey" + i, "anotherValue" + i));
+            Assert.assertEquals("anotherValue" + i, concurrentReferenceHashMap.get("anotherKey" + i));
+            Assert.assertTrue(concurrentReferenceHashMap.containsKey("anotherKey" + i));
+            Assert.assertTrue(concurrentReferenceHashMap.containsValue("anotherValue" + i));
         }
 
         System.gc(); // Forzo la garbage collection per rimuovere eventuali riferimenti deboli
@@ -584,6 +601,8 @@ public class ConcurrentReferenceHashMap_BranchCoverage_Test {
         Assert.assertTrue("Map should be empty after clear", concurrentReferenceHashMap.isEmpty());
         Assert.assertEquals("Map should have size 0 after clear", 0, concurrentReferenceHashMap.size());
         Assert.assertEquals("Map should have capacity 1407 after clear", 1407*2+1, concurrentReferenceHashMap.capacity());
+
+        Assert.assertTrue(valueExpired.get());
 
     }
 
@@ -592,11 +611,17 @@ public class ConcurrentReferenceHashMap_BranchCoverage_Test {
 
         int validKey = 1_000;
 
-        concurrentReferenceHashMap = new ConcurrentReferenceHashMap(
+        AtomicBoolean keyExpired = new AtomicBoolean(false);
+
+        concurrentReferenceHashMap = new TestConcurrentReferenceHashMap(
                 AbstractReferenceMap.ReferenceStrength.WEAK,
                 AbstractReferenceMap.ReferenceStrength.HARD,
-                10, // Dimensione iniziale della tabella
-                0.75f // Fattore di carico
+                10,                 // Dimensione iniziale della tabella
+                0.75f,              // Fattore di carico
+                (key -> {       // Gestore per la scadenza delle chiavi
+                    keyExpired.set(true);
+                }),
+                null
         );
 
         // Verifica che la mappa sia inizialmente vuota
@@ -639,11 +664,17 @@ public class ConcurrentReferenceHashMap_BranchCoverage_Test {
         // Aggiungo nuovamente le chiavi ma con valori diversi
         for(int i = 0; i < validKey; i++) {
             Assert.assertEquals("value" + i, concurrentReferenceHashMap.put("key" + i, "newValue" + i));
+            Assert.assertEquals("newValue" + i, concurrentReferenceHashMap.get("key" + i));
+            Assert.assertTrue(concurrentReferenceHashMap.containsKey("key" + i));
+            Assert.assertTrue(concurrentReferenceHashMap.containsValue("newValue" + i));
         }
 
         // Aggiungo chiavi differenti
         for(int i = 0; i < validKey; i++) {
             Assert.assertNull(concurrentReferenceHashMap.put("anotherKey" + i, "anotherValue" + i));
+            Assert.assertEquals("anotherValue" + i, concurrentReferenceHashMap.get("anotherKey" + i));
+            Assert.assertTrue(concurrentReferenceHashMap.containsKey("anotherKey" + i));
+            Assert.assertTrue(concurrentReferenceHashMap.containsValue("anotherValue" + i));
         }
 
         System.gc(); // Forzo la garbage collection per rimuovere eventuali riferimenti deboli
@@ -660,6 +691,8 @@ public class ConcurrentReferenceHashMap_BranchCoverage_Test {
         Assert.assertTrue("Map should be empty after clear", concurrentReferenceHashMap.isEmpty());
         Assert.assertEquals("Map should have size 0 after clear", 0, concurrentReferenceHashMap.size());
         Assert.assertEquals("Map should have capacity 1407 after clear", 1407*2+1, concurrentReferenceHashMap.capacity());
+
+        Assert.assertTrue(keyExpired.get());
 
     }
 
@@ -681,6 +714,42 @@ public class ConcurrentReferenceHashMap_BranchCoverage_Test {
         Assert.assertEquals(concurrentReferenceHashMap.get(key1), map.get(key1));
         Assert.assertEquals(concurrentReferenceHashMap.get(key2), map.get(key2));
         Assert.assertEquals(concurrentReferenceHashMap.get(key3), map.get(key3));
+    }
+
+    private class TestConcurrentReferenceHashMap extends ConcurrentReferenceHashMap {
+
+        private final ConcurrentReferenceHashMap_BranchCoverage_Test.ExpiredHandler keyExpiredHandler;
+        private final ConcurrentReferenceHashMap_BranchCoverage_Test.ExpiredHandler valueExpiredHandler;
+
+        public TestConcurrentReferenceHashMap(AbstractReferenceMap.ReferenceStrength keyType,
+                                              AbstractReferenceMap.ReferenceStrength valueType,
+                                              int initialCapacity,
+                                              float loadFactor,
+                                              ConcurrentReferenceHashMap_BranchCoverage_Test.ExpiredHandler keyExpired,
+                                              ConcurrentReferenceHashMap_BranchCoverage_Test.ExpiredHandler valueExpired) {
+            super(keyType, valueType, initialCapacity, loadFactor);
+            this.keyExpiredHandler = keyExpired;
+            this.valueExpiredHandler = valueExpired;
+        }
+
+        @Override
+        public void keyExpired(Object key) {
+            if (keyExpiredHandler != null) {
+                keyExpiredHandler.onExpired(key);
+            }
+        }
+
+        @Override
+        public void valueExpired(Object key) {
+            if (valueExpiredHandler != null) {
+                valueExpiredHandler.onExpired(key);
+            }
+        }
+    }
+
+    @FunctionalInterface
+    public interface ExpiredHandler {
+        void onExpired(Object key);
     }
 
 }
