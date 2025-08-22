@@ -154,17 +154,30 @@ public class CacheMap_MutationCoverage_Test {
     // mutation line 159
     /*
      * Va in errore poiché la dimensione della soft reference é 0.
+     * Quando viene chiamata la remove, ritorna un errore dovuto a una
+     * divisione per zero.
+     *
+     *  java.lang.ArithmeticException: / by zero
+     *      at org.apache.openjpa.lib.util.concurrent.ConcurrentReferenceHashMap.remove(ConcurrentReferenceHashMap.java:456)
+     *      at org.apache.openjpa.util.CacheMap.remove(CacheMap.java:192)
+     *      at org.apache.openjpa.util.CacheMap.put(CacheMap.java:409)
+     *
+     * Per calcolare l'indice della tabella soft viene usato
+     *
+     *  int index = (hash & 0x7FFFFFFF) % tab.length;
+     *
+     * ma tab.length é 0.
      */
-    /*@Test
+    @Test
     public void testCacheMap_mutationCoverage_03a() throws Exception {
 
         // Crea una CacheMap con maxSize 1
         cacheMap = new TestCacheMap(false, 1, (Object key, Object value) -> {
-            // Non dovrebbe essere chiamato
+            // Non dovrebbe essere chiamato dato che va in errore prima
             Assert.assertTrue(key.equals("key1") ||  key.equals("key2"));
             Assert.assertTrue(value.equals("value1") || value.equals("value2"));
         }, (Object key, Object value, boolean expired) -> {
-            // Non dovrebbe essere chiamato
+            // Non dovrebbe essere chiamato dato che va in errore prima
             Assert.assertEquals("key1", key);
             Assert.assertEquals("value1", value);
             Assert.assertTrue(expired);
@@ -180,9 +193,9 @@ public class CacheMap_MutationCoverage_Test {
 
         cacheMap.put("key1", "value1");
         cacheMap.put("key2", "value2");
-        // Verifica che la dimensione della cache sia ancora 0
-        Assert.assertEquals(0, cacheMap.size());
-    }*/
+        // Verifica che la dimensione della cache sia ancora 1
+        Assert.assertEquals(1, cacheMap.size());
+    }
 
     // mutation line 162
     // mutation line 169
